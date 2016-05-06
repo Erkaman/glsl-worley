@@ -5,7 +5,7 @@
 From this module, a GLSL implementation of Worley Noise written by [Stefan
 Gustavson](http://webstaff.itn.liu.se/~stegu/GLSL-cellular/GLSL-cellular-notes.pdf) can be imported.
 
-A demo can be found [here]()
+A demo can be found [here](http://erkaman.github.io/glsl-worley/)
 
 ## Usage
 
