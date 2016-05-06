@@ -19,9 +19,17 @@ var mouseLeftDownPrev = false;
 
 var bg = [0.6, 0.7, 1.0]; // clear color.
 
-var noiseScale = {val: 1.0};
+var noiseScale = {val: 5.0};
+var noiseJitter = {val: 1.0};
+var patternType = {val: 0};
+var manhattanDistance = {val:false};
+var noiseStrength = {val: 1.0};
+
 var seed = 100;
 
+// F1
+// F2
+// F2 - F1
 
 shell.on("gl-init", function () {
     var gl = shell.gl
@@ -51,6 +59,8 @@ function newSeed() {
 }
 
 shell.on("gl-render", function (t) {
+
+
     var gl = shell.gl
     var canvas = shell.canvas;
 
@@ -73,7 +83,17 @@ shell.on("gl-render", function (t) {
     sphereShader.uniforms.uView = view;
     sphereShader.uniforms.uProjection = projection;
     sphereShader.uniforms.uNoiseScale = noiseScale.val;
+    sphereShader.uniforms.uNoiseJitter = noiseJitter.val;
+    sphereShader.uniforms.uPatternType = patternType.val;
+    sphereShader.uniforms.uManhattanDistance = manhattanDistance.val;
+    sphereShader.uniforms.uNoiseStrength = noiseStrength.val;
+
+
+
+
     sphereShader.uniforms.uSeed = seed;
+
+    
     
     sphereGeo.bind(sphereShader);
     sphereGeo.draw();
@@ -99,6 +119,17 @@ shell.on("gl-render", function (t) {
 
 
     gui.sliderFloat("Scale", noiseScale, 0.1, 10.0);
+    gui.sliderFloat("Jitter", noiseJitter, 0.01, 1.0);
+    gui.sliderFloat("Strength", noiseStrength, 0.0, 2.0);
+
+    gui.checkbox("Manhattan", manhattanDistance);
+
+
+
+    gui.radioButton("F1", patternType, 0);
+    gui.radioButton("F2", patternType, 1);
+    gui.radioButton("F2-F1", patternType, 2);
+
 
     if(gui.button("New Seed")) {
         newSeed();
