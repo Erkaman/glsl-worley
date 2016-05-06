@@ -1,6 +1,6 @@
 {
   "name": "glsl-worley",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Worley noise implementation for WebGL shaders",
   "scripts": {
     "start": "budo --verbose example/index.js -t glslify --live --open",
@@ -30,8 +30,7 @@
     "pnp-gui": "0.0.3",
     "primitive-icosphere": "^1.0.2"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "directories": {
     "example": "example"
   },
