@@ -15,7 +15,7 @@ This module provides four functions, and they can be exported as
 #pragma glslify: worley3D = require(glsl-worley/worley3D.glsl)
 #pragma glslify: worley2x2x2 = require(glsl-worley/worley2x2x2.glsl)
 #pragma glslify: worley2D = require(glsl-worley/worley2D.glsl)
-#pragma glslify: worley2x2 = require(glsl-woryley/worley2x2.glsl)
+#pragma glslify: worley2x2 = require(glsl-worley/worley2x2.glsl)
 ```
 
 `worley3D` is defined as `vec2 worley3D(vec3 P, float jitter, bool manhattanDistance)`. It returns a `vec2`
