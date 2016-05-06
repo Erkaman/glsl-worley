@@ -11,7 +11,7 @@ var createGui = require("pnp-gui");
 var randomArray = require('random-array');
 var createSphere = require('primitive-icosphere');
 
-var sphereShader, quadGeo, sphereGeo;
+var noiseShader, quadGeo, sphereGeo, planeGeo;
 
 var camera = createOrbitCamera([0, -2.0, 0], [0, 0, 0], [0, 1, 0]);
 
@@ -24,10 +24,39 @@ var noiseJitter = {val: 1.0};
 var noiseVersion = {val: 10};
 
 var patternType = {val: 0};
-var manhattanDistance = {val:false};
+var manhattanDistance = {val: false};
 var noiseStrength = {val: 1.0};
 
 var seed = 100;
+
+const TWO_D = 20;
+const THREE_D = 21;
+
+var noiseDim = {val: THREE_D};
+
+function createPlane(n) {
+    var positions = [];
+    var cells = [];
+
+    for (var iy = 0; iy <= n; ++iy) {
+        for (var ix = 0; ix <= n; ++ix) {
+            var x = -1 / 2 + ix / n;
+            var y = 1 / 2 - iy / n;
+            var scale = 2.0;
+            positions.push([scale*x, 0, scale*y]);
+            if (iy < n && ix < n) {
+                cells.push([iy * (n + 1) + ix + 1, (iy + 1) * (n + 1) + ix + 1, iy * (n + 1) + ix]);
+                cells.push([iy * (n + 1) + ix, (iy + 1) * (n + 1) + ix + 1, (iy + 1) * (n + 1) + ix]);
+
+                cells.push([iy * (n + 1) + ix, (iy + 1) * (n + 1) + ix + 1, iy * (n + 1) + ix + 1]);
+                cells.push([(iy + 1) * (n + 1) + ix, (iy + 1) * (n + 1) + ix + 1, iy * (n + 1) + ix]);
+            }
+        }
+    }
+
+    return {positions: positions, cells: cells};
+}
+
 
 // F1
 // F2
@@ -39,20 +68,24 @@ shell.on("gl-init", function () {
     gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.CULL_FACE);
     gl.cullFace(gl.BACK)
-    
-    gui = new createGui(gl);
-    gui.windowSizes = [300, 380];
 
-    var sphere = createSphere(1, { subdivisions: 2});
+    gui = new createGui(gl);
+    gui.windowSizes = [300, 420];
+
+    var sphere = createSphere(1, {subdivisions: 2});
     sphereGeo = Geometry(gl)
         .attr('aPosition', sphere.positions).faces(sphere.cells);
 
+    var plane = createPlane(1);
+    planeGeo = Geometry(gl)
+        .attr('aPosition', plane.positions).faces(plane.cells);
 
-    sphereShader = glShader(gl, glslify("./sphere_vert.glsl"), glslify("./sphere_frag.glsl"));
+
+    noiseShader = glShader(gl, glslify("./sphere_vert.glsl"), glslify("./sphere_frag.glsl"));
 
 
     // fix intial camera view.
-    camera.rotate([0,0], [0,0] );
+    camera.rotate([0, 0], [0, 0]);
 });
 
 
@@ -77,29 +110,40 @@ shell.on("gl-render", function (t) {
     mat4.perspective(projection, Math.PI / 2, canvas.width / canvas.height, 0.1, 10000.0);
 
     /*
-    Render Sphere
+     Render Sphere
      */
 
-    sphereShader.bind();
 
-    sphereShader.uniforms.uView = view;
-    sphereShader.uniforms.uProjection = projection;
-    sphereShader.uniforms.uNoiseScale = noiseScale.val;
-    sphereShader.uniforms.uNoiseJitter = noiseJitter.val;
-    sphereShader.uniforms.uPatternType = patternType.val;
-    sphereShader.uniforms.uManhattanDistance = manhattanDistance.val;
-    sphereShader.uniforms.uNoiseStrength = noiseStrength.val;
-    sphereShader.uniforms.uUseOrignalNoise = (noiseVersion.val == 10);
+    noiseShader.bind();
 
-    sphereShader.uniforms.uSeed = seed;
-    
-    
-    sphereGeo.bind(sphereShader);
-    sphereGeo.draw();
+    noiseShader.uniforms.uView = view;
+    noiseShader.uniforms.uProjection = projection;
+    noiseShader.uniforms.uNoiseScale = noiseScale.val;
+    noiseShader.uniforms.uNoiseJitter = noiseJitter.val;
+    noiseShader.uniforms.uPatternType = patternType.val;
+    noiseShader.uniforms.uManhattanDistance = manhattanDistance.val;
+    noiseShader.uniforms.uNoiseStrength = noiseStrength.val;
+    noiseShader.uniforms.uUseOrignalNoise = (noiseVersion.val == 10);
+    noiseShader.uniforms.u3D= (noiseDim.val == THREE_D);
+
+    noiseShader.uniforms.uSeed = seed;
+
+    if (noiseDim.val == THREE_D) {
+
+
+        sphereGeo.bind(noiseShader);
+        sphereGeo.draw();
+
+
+    } else {
+        planeGeo.bind(noiseShader);
+        planeGeo.draw();
+
+    }
 
 
     /*
-    Render GUI.
+     Render GUI.
      */
 
     var pressed = shell.wasDown("mouse-left");
@@ -114,6 +158,25 @@ shell.on("gl-render", function (t) {
 
     gui.begin(io, "Window");
 
+
+    gui.separator();
+
+    gui.textLine("Noise Dimension");
+
+    gui.radioButton("2D", noiseDim, TWO_D);
+    gui.radioButton("3D", noiseDim, THREE_D);
+
+
+    gui.separator();
+
+    gui.textLine("Noise Version");
+
+    gui.radioButton("Original", noiseVersion, 10);
+    gui.radioButton("Faster", noiseVersion, 11);
+
+    gui.separator();
+
+
     gui.textLine("Noise Settings");
 
 
@@ -124,20 +187,17 @@ shell.on("gl-render", function (t) {
     gui.checkbox("Manhattan", manhattanDistance);
 
 
-
     gui.radioButton("F1", patternType, 0);
     gui.radioButton("F2", patternType, 1);
     gui.radioButton("F2-F1", patternType, 2);
 
-    gui.separator();
 
-    gui.radioButton("Original", noiseVersion, 10);
-    gui.radioButton("Faster", noiseVersion, 11);
+    /*
 
-
-    if(gui.button("New Seed")) {
-        newSeed();
-    }
+     if(gui.button("New Seed")) {
+     newSeed();
+     }
+     */
 
     gui.end(gl, canvas.width, canvas.height);
 });
