@@ -18,6 +18,15 @@ This module provides four functions, and they can be exported as
 #pragma glslify: worley2x2 = require(glsl-worley/worley2x2.glsl)
 ```
 
+And then they can easily be used to generate a texture in a shader by doing something like:
+
+```glsl
+  vec2 F = worley3D(vPosition, 1.0, false);
+  float F1 = F.x;
+  float F2 = F.y;
+  gl_FragColor = vec4(vec3(F2-F1), 1.0);
+```
+
 `worley3D` is defined as `vec2 worley3D(vec3 P, float jitter, bool manhattanDistance)`. It returns a `vec2`
  where `x` is `F1` and `y` is `F2`(it is assumed that the reader knows the meaning of these two).
 `P` is the input point, `jitter` is the amount of jitter in the pattern, and if `manhattanDistance` is true,
