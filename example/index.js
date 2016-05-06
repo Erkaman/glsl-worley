@@ -21,6 +21,8 @@ var bg = [0.6, 0.7, 1.0]; // clear color.
 
 var noiseScale = {val: 5.0};
 var noiseJitter = {val: 1.0};
+var noiseVersion = {val: 10};
+
 var patternType = {val: 0};
 var manhattanDistance = {val:false};
 var noiseStrength = {val: 1.0};
@@ -87,12 +89,9 @@ shell.on("gl-render", function (t) {
     sphereShader.uniforms.uPatternType = patternType.val;
     sphereShader.uniforms.uManhattanDistance = manhattanDistance.val;
     sphereShader.uniforms.uNoiseStrength = noiseStrength.val;
-
-
-
+    sphereShader.uniforms.uUseOrignalNoise = (noiseVersion.val == 10);
 
     sphereShader.uniforms.uSeed = seed;
-
     
     
     sphereGeo.bind(sphereShader);
@@ -129,6 +128,11 @@ shell.on("gl-render", function (t) {
     gui.radioButton("F1", patternType, 0);
     gui.radioButton("F2", patternType, 1);
     gui.radioButton("F2-F1", patternType, 2);
+
+    gui.separator();
+
+    gui.radioButton("Original", noiseVersion, 10);
+    gui.radioButton("Faster", noiseVersion, 11);
 
 
     if(gui.button("New Seed")) {

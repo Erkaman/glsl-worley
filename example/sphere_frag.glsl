@@ -8,12 +8,20 @@ uniform float uSeed;
 uniform int uPatternType;
 uniform bool uManhattanDistance;
 uniform float uNoiseStrength;
+uniform bool uUseOrignalNoise;
 
 #pragma glslify: worley3D = require(../worley3D.glsl)
+#pragma glslify: worley2x2x2 = require(../worley2x2x2.glsl)
 
 
 void main() {
-   vec2 F = worley3D(vPosition*uNoiseScale, uNoiseJitter, uManhattanDistance);
+    vec2 F;
+    if(uUseOrignalNoise) {
+        F = worley3D(vPosition*uNoiseScale, uNoiseJitter, uManhattanDistance);
+    } else {
+        F = worley2x2x2(vPosition*uNoiseScale, uNoiseJitter, uManhattanDistance);
+    }
+
    float F1 = F.x;
    float F2 = F.y;
 
