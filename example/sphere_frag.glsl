@@ -4,7 +4,6 @@ varying vec3 vPosition;
 
 uniform float uNoiseScale;
 uniform float uNoiseJitter;
-uniform float uSeed;
 uniform int uPatternType;
 uniform bool uManhattanDistance;
 uniform float uNoiseStrength;
@@ -39,7 +38,6 @@ void main() {
    float F1 = F.x;
    float F2 = F.y;
 
-
    float val;
 
    if(uPatternType == 0) {
@@ -52,5 +50,5 @@ void main() {
 
    val *= uNoiseStrength;
 
-    gl_FragColor = vec4(vec3(val), 1.0);
+    gl_FragColor = vec4( vec3(val), 1.0);
 }

@@ -8,7 +8,6 @@ var glslify = require('glslify')
 var createOrbitCamera = require('orbit-camera');
 var shell = require("gl-now")();
 var createGui = require("pnp-gui");
-var randomArray = require('random-array');
 var createSphere = require('primitive-icosphere');
 
 var noiseShader, quadGeo, sphereGeo, planeGeo;
@@ -27,7 +26,6 @@ var patternType = {val: 0};
 var manhattanDistance = {val: false};
 var noiseStrength = {val: 1.0};
 
-var seed = 100;
 
 const TWO_D = 20;
 const THREE_D = 21;
@@ -48,6 +46,7 @@ function createPlane(n) {
                 cells.push([iy * (n + 1) + ix + 1, (iy + 1) * (n + 1) + ix + 1, iy * (n + 1) + ix]);
                 cells.push([iy * (n + 1) + ix, (iy + 1) * (n + 1) + ix + 1, (iy + 1) * (n + 1) + ix]);
 
+                // also create backside.
                 cells.push([iy * (n + 1) + ix, (iy + 1) * (n + 1) + ix + 1, iy * (n + 1) + ix + 1]);
                 cells.push([(iy + 1) * (n + 1) + ix, (iy + 1) * (n + 1) + ix + 1, iy * (n + 1) + ix]);
             }
@@ -80,7 +79,6 @@ shell.on("gl-init", function () {
     planeGeo = Geometry(gl)
         .attr('aPosition', plane.positions).faces(plane.cells);
 
-
     noiseShader = glShader(gl, glslify("./sphere_vert.glsl"), glslify("./sphere_frag.glsl"));
 
 
@@ -88,10 +86,6 @@ shell.on("gl-init", function () {
     camera.rotate([0, 0], [0, 0]);
 });
 
-
-function newSeed() {
-    seed = randomArray(0.0, 100.0).oned(1)[0];
-}
 
 shell.on("gl-render", function (t) {
 
@@ -126,8 +120,6 @@ shell.on("gl-render", function (t) {
     noiseShader.uniforms.uUseOrignalNoise = (noiseVersion.val == 10);
     noiseShader.uniforms.u3D= (noiseDim.val == THREE_D);
 
-    noiseShader.uniforms.uSeed = seed;
-
     if (noiseDim.val == THREE_D) {
 
 
@@ -156,10 +148,8 @@ shell.on("gl-render", function (t) {
     };
     mouseLeftDownPrev = pressed;
 
-    gui.begin(io, "Window");
+    gui.begin(io, "Settings");
 
-
-    gui.separator();
 
     gui.textLine("Noise Dimension");
 
@@ -192,12 +182,6 @@ shell.on("gl-render", function (t) {
     gui.radioButton("F2-F1", patternType, 2);
 
 
-    /*
-
-     if(gui.button("New Seed")) {
-     newSeed();
-     }
-     */
 
     gui.end(gl, canvas.width, canvas.height);
 });

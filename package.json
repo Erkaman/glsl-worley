@@ -1,7 +1,7 @@
 {
-  "name": "glsl-cos-palette",
+  "name": "glsl-worley",
   "version": "1.0.0",
-  "description": "glsl function for making cosine palettes",
+  "description": "Worley noise implementation for WebGL shaders",
   "scripts": {
     "start": "budo --verbose example/index.js -t glslify --live --open",
     "test": "standard"
@@ -11,11 +11,9 @@
     "glsl",
     "gl",
     "webgl",
-    "procedual",
-    "palette",
-    "cos",
-    "cosine",
-    "palette",
+    "procedural",
+    "worley",
+    "cellular",
     "texture",
     "noise"
   ],
@@ -44,7 +42,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Erkaman/glsl-cos-palette.git"
+    "url": "https://github.com/Erkaman/glsl-worley.git"
   },
-  "homepage": "https://github.com/Erkaman/glsl-cos-palette#readme"
+  "homepage": "https://github.com/Erkaman/glsl-worley#readme"
 }

@@ -1,55 +1,34 @@
-# cos-palette
+# glsl-worley
 
-`cosPalette` is a simple shader function that is defined as
+<img src="images/worley.png" width="356" height="366" />
 
-```glsl
-vec3 cosPalette(  float t,  vec3 a,  vec3 b,  vec3 c, vec3 d ){
-    return a + b*cos( 6.28318*(c*t+d) );
-}
-```
+From this module, a GLSL implementation of Worley Noise written by [Stefan
+Gustavson](http://webstaff.itn.liu.se/~stegu/GLSL-cellular/GLSL-cellular-notes.pdf) can be imported.
 
-where `a,b,c,d` are RGB-colors. This function can be used to make very compact color palettes.
-A simple editor for making such palettes is provided [here](http://erkaman.github.io/glsl-cos-palette/).
+A demo can be found [here]()
 
+## Usage
 
-The function `cosPalette(t, a, b,  c, d )`, which is the palette, will basically assign a color to every value `t`, which is in the range `[0,1]`. So if you set `t` to be the value of some noise function(say, Perlin noise) in range `[0,1]`, you can use this
-palette to make simple procedural textures. The palette will basically colorize the noise. In the fragment shader, we can easily procedurally generate a texture by doing something like
+This module provides four functions, and they can be exported as
 
 ```glsl
-    float t = noise(vPosition);
-    vec3 tex = cosPalette(t, uAColor, uBColor, uCColor, uDColor );
+#pragma glslify: worley3D = require(glsl-worley/worley3D.glsl)
+#pragma glslify: worley2x2x2 = require(glsl-worley/worley2x2x2.glsl)
+#pragma glslify: worley2D = require(glsl-worley/worley2D.glsl)
+#pragma glslify: worley2x2 = require(glsl-woryley/worley2x2.glsl)
 ```
 
-Credit goes to [Inigo Quilez](http://www.iquilezles.org/www/articles/palettes/palettes.htm) for coming up with this technique.
+`worley3D` is defined as `vec2 worley3D(vec3 P, float jitter, bool manhattanDistance)`. It returns a `vec2`
+ where `x` is `F1` and `y` is `F2`(it is assumed that the reader knows the meaning of these two).
+`P` is the input point, `jitter` is the amount of jitter in the pattern, and if `manhattanDistance` is true,
+then a manhattan distance is used to generate the pattern, instead of the usual Euclidean distance(this basically makes
+ the noise appear more "jagged").
 
-## Examples
+ The remaining three functions take the same arguments, except that in the case of `worley2D` and `worley2x2`, `P` is a
+ `vec2`.
 
-Below are some examples of palettes
-
-`cosPalette(t,vec3(0.2,0.7,0.4),vec3(0.6,0.9,0.2),vec3(0.6,0.8,0.7),vec3(0.5,0.1,0.0))`
-
-
-<img src="images/f.png" width="356" height="366" />
-
-
-`cosPalette(t,vec3(0.2,0.5,0.3),vec3(0.0,0.5,0.7),vec3(1.0,1.0,1.0),vec3(0.0,0.3,0.7))`
-
-<img src="images/g.png" width="356" height="366" />
-
-
-`cosPalette(t,vec3(0.6,0.0,0.0),vec3(1.0,0.0,0.0),vec3(1.0,0.0,0.0),vec3(1.0,0.0,0.0))`
-
-<img src="images/h.png" width="356" height="366" />
-
-
-`cosPalette(t,vec3(1.0,0.4,0.0),vec3(0.4,0.8,0.0),vec3(0.5,0.3,0.9),vec3(0.9,0.6,0.9))`
-
-<img src="images/j.png" width="356" height="366" />
-
-
-`cosPalette(t,vec3(0.4,0.3,0.1),vec3(0.1,0.1,0.1),vec3(0.4,0.4,0.4),vec3(0.0,0.0,0.0))`
-
-<img src="images/l.png" width="356" height="366" />
+ `worley2x2x2` is basically a faster version of `worley3D`. But be aware that it has some artifacts. In the same manner,
+ `worley2x2` is basically a faster version of `worley2D`, but with some potential artifacts.
 
 
 
